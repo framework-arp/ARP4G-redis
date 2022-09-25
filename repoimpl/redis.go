@@ -104,13 +104,12 @@ func NewRedisMutexes(client *redis.Client, key string) *RedisMutexes {
 }
 
 type RedisQueryFuncs[T any] struct {
-	client        *redis.Client
-	key           string
-	newZeroEntity arp.NewZeroEntity[T]
+	client *redis.Client
+	key    string
 }
 
-func NewRedisQueryFuncs[T any](client *redis.Client, key string, newZeroEntity arp.NewZeroEntity[T]) *RedisQueryFuncs[T] {
-	return &RedisQueryFuncs[T]{client, key, newZeroEntity}
+func NewRedisQueryFuncs[T any](client *redis.Client, key string) *RedisQueryFuncs[T] {
+	return &RedisQueryFuncs[T]{client, key}
 }
 
 func (qf *RedisQueryFuncs[T]) QueryAllIds(ctx context.Context) (ids []any, err error) {
@@ -160,5 +159,5 @@ func NewRedisRepositoryWithMutexesimpl[T any](client *redis.Client, key string, 
 		return arp.NewMockQueryRepository(newEmptyEntity)
 	}
 	store := NewRedisStore(client, key, newEmptyEntity)
-	return arp.NewQueryRepository[T](arp.NewRepository[T](store, mutexesimpl, newEmptyEntity), NewRedisQueryFuncs(client, key, newEmptyEntity))
+	return arp.NewQueryRepository[T](arp.NewRepository[T](store, mutexesimpl, newEmptyEntity), NewRedisQueryFuncs[T](client, key))
 }
