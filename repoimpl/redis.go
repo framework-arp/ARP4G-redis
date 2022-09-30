@@ -18,17 +18,17 @@ type RedisStore[T any] struct {
 	newEmptyEntity arp.NewZeroEntity[T]
 }
 
-func (store *RedisStore[T]) Load(ctx context.Context, id any) (*T, error) {
+func (store *RedisStore[T]) Load(ctx context.Context, id any) (entity T, found bool, err error) {
 	jsonStr := store.client.HGet(ctx, store.key+util.Strval(id), "json").Val()
 	if jsonStr == "" {
-		return nil, nil
+		return entity, false, nil
 	}
-	entity := store.newEmptyEntity()
+	entity = store.newEmptyEntity()
 	json.Unmarshal([]byte(jsonStr), entity)
-	return entity, nil
+	return entity, true, nil
 }
 
-func (store *RedisStore[T]) Save(ctx context.Context, id any, entity *T) error {
+func (store *RedisStore[T]) Save(ctx context.Context, id any, entity T) error {
 	json, err := json.Marshal(entity)
 	if err != nil {
 		return err
