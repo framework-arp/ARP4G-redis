@@ -56,7 +56,7 @@ func (store *RedisStore[T]) SaveAll(ctx context.Context, entitiesToInsert map[an
 }
 
 func (store *RedisStore[T]) RemoveAll(ctx context.Context, ids []any) error {
-	for id := range ids {
+	for _, id := range ids {
 		store.client.HDel(ctx, store.key+util.Strval(id), "json")
 	}
 	return nil
