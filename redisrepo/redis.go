@@ -3,6 +3,7 @@ package redisrepo
 import (
 	"context"
 	"encoding/json"
+	"errors"
 
 	"github.com/zhengchengdong/ARP4G/arp"
 	"github.com/zhengchengdong/ARP4G/util"
@@ -144,6 +145,10 @@ func (qf *RedisQueryFuncs[T]) Count(ctx context.Context) (uint64, error) {
 		return 0, nil
 	}
 	return uint64(len(ids)), nil
+}
+
+func (qf *RedisQueryFuncs[T]) QueryAllByField(ctx context.Context, fieldName string, fieldValue any) ([]T, error) {
+	return nil, errors.New("notsupported")
 }
 
 func NewRedisRepository[T any](client *redis.Client, key string, newEmptyEntity arp.NewZeroEntity[T]) arp.QueryRepository[T] {
