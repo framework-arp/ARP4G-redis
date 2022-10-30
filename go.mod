@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/go-redsync/redsync/v4 v4.6.0
-	github.com/zhengchengdong/ARP4G v0.0.0-20221027031006-475084b43c94
+	github.com/zhengchengdong/ARP4G v0.0.0-20221028095737-7dc9b786a5b5
 )
 
 require (
