@@ -3,7 +3,6 @@ package redisrepo
 import (
 	"context"
 	"encoding/json"
-	"errors"
 
 	"github.com/framework-arp/ARP4G/arp"
 	"github.com/framework-arp/ARP4G/util"
@@ -104,22 +103,21 @@ func NewRedisMutexes(client *redis.Client, key string) *RedisMutexes {
 	return &RedisMutexes{key, rs}
 }
 
-type RedisQueryFuncs[T any] struct {
+type RedisRepository[T any] struct {
+	arp.Repository[T]
 	client *redis.Client
 	key    string
 }
 
-func NewRedisQueryFuncs[T any](client *redis.Client, key string) *RedisQueryFuncs[T] {
-	return &RedisQueryFuncs[T]{client, key}
-}
-
-func (qf *RedisQueryFuncs[T]) QueryAllIds(ctx context.Context) (ids []any, err error) {
-
+func (repo *RedisRepository[T]) QueryAllIds(ctx context.Context) (ids []any, err error) {
+	if repo.client == nil {
+		return nil, nil
+	}
 	var cursor uint64
 	var keys []string
 	for {
 		var someKeys []string
-		someKeys, cursor, err = qf.client.Scan(ctx, cursor, qf.key+"*", 100).Result()
+		someKeys, cursor, err = repo.client.Scan(ctx, cursor, repo.key+"*", 100).Result()
 		if err != nil {
 			return nil, err
 		}
@@ -130,14 +128,17 @@ func (qf *RedisQueryFuncs[T]) QueryAllIds(ctx context.Context) (ids []any, err e
 	}
 	ids = make([]any, len(keys))
 	for i, key := range keys {
-		id := key[len(qf.key):]
+		id := key[len(repo.key):]
 		ids[i] = id
 	}
 	return
 }
 
-func (qf *RedisQueryFuncs[T]) Count(ctx context.Context) (uint64, error) {
-	ids, err := qf.QueryAllIds(ctx)
+func (repo *RedisRepository[T]) Count(ctx context.Context) (uint64, error) {
+	if repo.client == nil {
+		return 0, nil
+	}
+	ids, err := repo.QueryAllIds(ctx)
 	if err != nil {
 		return 0, err
 	}
@@ -147,22 +148,18 @@ func (qf *RedisQueryFuncs[T]) Count(ctx context.Context) (uint64, error) {
 	return uint64(len(ids)), nil
 }
 
-func (qf *RedisQueryFuncs[T]) QueryAllByField(ctx context.Context, fieldName string, fieldValue any) ([]T, error) {
-	return nil, errors.New("notsupported")
-}
-
-func NewRedisRepository[T any](client *redis.Client, key string, newEmptyEntity arp.NewZeroEntity[T]) arp.QueryRepository[T] {
+func NewRedisRepository[T any](client *redis.Client, key string, newZeroEntity arp.NewZeroEntity[T]) *RedisRepository[T] {
 	if client == nil {
-		return arp.NewMockQueryRepository(newEmptyEntity)
+		return &RedisRepository[T]{arp.NewMockRepository[T](newZeroEntity), nil, key}
 	}
 	mutexesimpl := NewRedisMutexes(client, key)
-	return NewRedisRepositoryWithMutexesimpl(client, key, newEmptyEntity, mutexesimpl)
+	return NewRedisRepositoryWithMutexesimpl(client, key, newZeroEntity, mutexesimpl)
 }
 
-func NewRedisRepositoryWithMutexesimpl[T any](client *redis.Client, key string, newEmptyEntity arp.NewZeroEntity[T], mutexesimpl arp.Mutexes) arp.QueryRepository[T] {
+func NewRedisRepositoryWithMutexesimpl[T any](client *redis.Client, key string, newZeroEntity arp.NewZeroEntity[T], mutexesimpl arp.Mutexes) *RedisRepository[T] {
 	if client == nil {
-		return arp.NewMockQueryRepository(newEmptyEntity)
+		return &RedisRepository[T]{arp.NewMockRepository[T](newZeroEntity), nil, key}
 	}
-	store := NewRedisStore(client, key, newEmptyEntity)
-	return arp.NewQueryRepository[T](arp.NewRepository[T](store, mutexesimpl, newEmptyEntity), NewRedisQueryFuncs[T](client, key))
+	store := NewRedisStore(client, key, newZeroEntity)
+	return &RedisRepository[T]{arp.NewRepository[T](store, mutexesimpl, newZeroEntity), client, key}
 }

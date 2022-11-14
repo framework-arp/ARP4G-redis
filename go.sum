@@ -9,6 +9,8 @@ github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f h1:lO4WD4F/r
 github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f/go.mod h1:cuUVRXasLTGF7a8hSLbxyZXjz+1KgoB3wDUb6vlszIc=
 github.com/framework-arp/ARP4G v0.0.0-20221101135827-cade366e1843 h1:GQQmA7lOuECm3XDyTtS41TIxojf9nUGqZCHoLIHHrA8=
 github.com/framework-arp/ARP4G v0.0.0-20221101135827-cade366e1843/go.mod h1:rvQvrMyIeSid/e5WYhC9OTns0OrBJbhD4OW8MxVcLg8=
+github.com/framework-arp/ARP4G v0.0.0-20221114095219-517506c34438 h1:d2YYwkGhM8gz7wLFvjrUcreAMxZo8+oVsplDj6Ko0Q8=
+github.com/framework-arp/ARP4G v0.0.0-20221114095219-517506c34438/go.mod h1:rvQvrMyIeSid/e5WYhC9OTns0OrBJbhD4OW8MxVcLg8=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
 github.com/fsnotify/fsnotify v1.4.9 h1:hsms1Qyu0jgnwNXIxa+/V/PDsU6CfLf6CNO8H7IWoS4=
 github.com/fsnotify/fsnotify v1.4.9/go.mod h1:znqG4EE+3YCdAaPaxE2ZRY/06pZUdp0tY4IgpuI1SZQ=
